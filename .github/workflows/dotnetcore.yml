@@ -1,4 +1,4 @@
-name: eShopOnWeb Build and Test
+name: eShopOnWeb dotnetcore
 
 #Triggers (uncomment line below to use it)
 # on: [push, pull_request, workflow_dispatch]
