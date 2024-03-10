@@ -31,7 +31,7 @@ public class IndexModel : PageModel
                 Id = 0,
                 Name = "This item is on sale",
                 Price = 9.99M,
-                PictureUri = "http://externalcatalogbaseurltobereplaced/api/pic/1"
+                PictureUri = "https://th.bing.com/th/id/OIP.UoqeqDFUEcuW8f9Eb5mFNwHaGU?pid=ImgDet&w=211&h=180&c=7&dpr=1.6"
             });
 
             CatalogModel.PaginationInfo.TotalItems = 1;
