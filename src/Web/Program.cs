@@ -22,8 +22,14 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration.FeatureManagement
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.FeatureManagement;
 
+//추가
+using System.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
+
+// 추가
+Microsoft.eShopWeb.Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
 
 if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Docker"){
     // Configure SQL Server (local)
@@ -97,15 +103,15 @@ builder.Services.Configure<ServiceConfig>(config =>
 });
 
 
-// Bind configuration "eShopOnWeb:Settings" section to the Settings ojbect
-builder.Services.Configure<SettingsViewModel>(builder.Configuration.GetSection("eShopOnWeb:Settings"));
-
-// Initialize useAppConfig parameter
+// 추가 Bind configuration "eShopWeb:Settings" section to the Settings object
+builder.Services.Configure<SettingsViewModel>(builder.Configuration.GetSection("eShopWeb:Settings"));
+// 추가 Initialize useAppConfig parameter
 var useAppConfig = false;
-
+// 추가
 Boolean.TryParse(builder.Configuration["UseAppConfig"], out useAppConfig);
+// 추가 Add Azure App Configuration middleware to the container of services.
 
-// Load configuration from Azure App Configuration
+// 추가 Load configuration from Azure App Configuration
 if (useAppConfig)
 {
     builder.Services.AddAzureAppConfiguration();
@@ -113,21 +119,19 @@ if (useAppConfig)
 
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
-        options.Connect(builder.Configuration["AppConfigConnection"])
-               .ConfigureRefresh(refresh =>
-               {
-                   refresh.Register("eShopOnWeb:Settings:NoResultMessage").SetCacheExpiration(TimeSpan.FromSeconds(10));
-               })
-               .UseFeatureFlags(FeatureFlagOptions => {
-                   FeatureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(10);
-               });
+         options.Connect(builder.Configuration["AppConfigConnection"])
+        .ConfigureRefresh(refresh =>
+        {
+            // Default cache expiration is 30 seconds
+            refresh.Register("eShopWeb:Settings:NoResultsMessage").SetCacheExpiration(TimeSpan.FromSeconds(10));
+        })
+        .UseFeatureFlags(featureFlagOptions =>
+        {
+            // Default cache expiration is 30 seconds
+            featureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(10);
+        });
     });
 }
-
-
-
-
-
 
 
 // blazor configuration

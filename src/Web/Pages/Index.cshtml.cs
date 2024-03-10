@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.eShopWeb.Web.Services;
 using Microsoft.eShopWeb.Web.ViewModels;
+
+//추가
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
 namespace Microsoft.eShopWeb.Web.Pages;
@@ -9,14 +12,24 @@ public class IndexModel : PageModel
 {
     private readonly ICatalogViewModelService _catalogViewModelService;
 
-    public IndexModel(ICatalogViewModelService catalogViewModelService)
+    //추가
+    private IFeatureManager _featureManager;
+    //추가
+    public SettingsViewModel SettingsModel { get; }
+
+
+    //수정
+    public IndexModel(ICatalogViewModelService catalogViewModelService, IFeatureManager featureManager, IOptionsSnapshot<SettingsViewModel> options)
     {
         _catalogViewModelService = catalogViewModelService;
+        SettingsModel = options.Value;
+        _featureManager = featureManager;
     }
 
     public required CatalogIndexViewModel CatalogModel { get; set; } = new CatalogIndexViewModel();
 
-    private readonly IFeatureManager _featureManager;
+
+    //수정
     public async Task OnGet(CatalogIndexViewModel catalogModel, int? pageId)
     {
         if (await _featureManager.IsEnabledAsync("onsales"))
@@ -29,9 +42,9 @@ public class IndexModel : PageModel
             CatalogModel.CatalogItems.Add(new CatalogItemViewModel()
             {
                 Id = 0,
-                Name = "This item is on sale",
-                Price = 9.99M,
-                PictureUri = "https://th.bing.com/th/id/OIP.UoqeqDFUEcuW8f9Eb5mFNwHaGU?pid=ImgDet&w=211&h=180&c=7&dpr=1.6"
+                Name = "Hot Black Friday Deal 70%",
+                PictureUri = "https://th.bing.com/th/id/OIP.LLJAuXX83OJFSHj-Lr8voAHaEL?w=307&h=180&c=7&r=0&o=5&dpr=1.1&pid=1.7",
+                Price = 9.99M
             });
 
             CatalogModel.PaginationInfo.TotalItems = 1;
