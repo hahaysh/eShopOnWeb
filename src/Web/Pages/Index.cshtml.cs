@@ -1,7 +1,8 @@
-﻿﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.eShopWeb.Web.Services;
 using Microsoft.eShopWeb.Web.ViewModels;
 using Microsoft.Extensions.Options;
+
 using Microsoft.FeatureManagement;
 
 namespace Microsoft.eShopWeb.Web.Pages;
