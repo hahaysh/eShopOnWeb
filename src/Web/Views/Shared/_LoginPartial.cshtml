@@ -1,5 +1,6 @@
 ﻿@if (Context!.User!.Identity!.IsAuthenticated)
 {
+
     <section class="col-lg-4 col-md-5 col-xs-12">
         <div class="esh-identity">
             <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm" class="navbar-right">
@@ -45,10 +46,12 @@ else
         <div class="esh-identity">
             <section class="esh-identity-section">
                 <div class="esh-identity-item">
-
+                    
+                    <feature name="login">
                     <a asp-area="Identity" asp-page="/Account/Login" class="esh-identity-name esh-identity-name--upper">
                         Login
                     </a>
+                    </feature>
                 </div>
             </section>
         </div>

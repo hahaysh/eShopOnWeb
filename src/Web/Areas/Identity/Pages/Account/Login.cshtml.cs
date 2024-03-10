@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.Infrastructure.Identity;
+using Microsoft.FeatureManagement.Mvc;
 
 namespace Microsoft.eShopWeb.Web.Areas.Identity.Pages.Account;
 
+[FeatureGate("login")]
 [AllowAnonymous]
 public class LoginModel : PageModel
 {

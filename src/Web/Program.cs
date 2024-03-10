@@ -17,7 +17,10 @@ using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.eShopWeb.Web;
 using Microsoft.eShopWeb.Web.Configuration;
 using Microsoft.eShopWeb.Web.HealthChecks;
+using Microsoft.eShopWeb.Web.Pages;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration.FeatureManagement;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
@@ -92,6 +95,40 @@ builder.Services.Configure<ServiceConfig>(config =>
     config.Services = new List<ServiceDescriptor>(builder.Services);
     config.Path = "/allservices";
 });
+
+
+// Bind configuration "eShopOnWeb:Settings" section to the Settings ojbect
+builder.Services.Configure<SettingsViewModel>(builder.Configuration.GetSection("eShopOnWeb:Settings"));
+
+// Initialize useAppConfig parameter
+var useAppConfig = false;
+
+Boolean.TryParse(builder.Configuration["UseAppConfig"], out useAppConfig);
+
+// Load configuration from Azure App Configuration
+if (useAppConfig)
+{
+    builder.Services.AddAzureAppConfiguration();
+    builder.Services.AddFeatureManagement();
+
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options.Connect(builder.Configuration["AppConfigConnection"])
+               .ConfigureRefresh(refresh =>
+               {
+                   refresh.Register("eShopOnWeb:Settings:NoResultMessage").SetCacheExpiration(TimeSpan.FromSeconds(10));
+               })
+               .UseFeatureFlags(FeatureFlagOptions => {
+                   FeatureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(10);
+               });
+    });
+}
+
+
+
+
+
+
 
 // blazor configuration
 var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguration.CONFIG_NAME);
