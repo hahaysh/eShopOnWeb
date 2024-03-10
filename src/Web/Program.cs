@@ -1,6 +1,5 @@
 ﻿using System.Net.Mime;
 using Ardalis.ListStartupServices;
-using Azure.Identity;
 using BlazorAdmin;
 using BlazorAdmin.Services;
 using Blazored.LocalStorage;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.Infrastructure.Data;
@@ -17,39 +15,20 @@ using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.eShopWeb.Web;
 using Microsoft.eShopWeb.Web.Configuration;
 using Microsoft.eShopWeb.Web.HealthChecks;
-using Microsoft.eShopWeb.Web.Pages;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration.FeatureManagement;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Azure.Identity;
+using Microsoft.eShopWeb.Web.Pages;
 using Microsoft.FeatureManagement;
-
-//추가
+using Microsoft.IdentityModel.Tokens;
+//using Microsoft.ApplicationInsights;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+//var telemetryClient = new TelemetryClient() { InstrumentationKey = "d9657adf-ffae-48cb-8f08-e676f16905ea" };
+
 builder.Logging.AddConsole();
 
-// 추가
 Microsoft.eShopWeb.Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
-
-if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Docker"){
-    // Configure SQL Server (local)
-    Microsoft.eShopWeb.Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
-}
-else{
-    // Configure SQL Server (prod)
-    var credential = new ChainedTokenCredential(new AzureDeveloperCliCredential(), new DefaultAzureCredential());
-    builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"] ?? ""), credential);
-    builder.Services.AddDbContext<CatalogContext>(c =>
-    {
-        var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CATALOG_CONNECTION_STRING_KEY"] ?? ""];
-        c.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
-    });
-    builder.Services.AddDbContext<AppIdentityDbContext>(options =>
-    {
-        var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_IDENTITY_CONNECTION_STRING_KEY"] ?? ""];
-        options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
-    });
-}
 
 builder.Services.AddCookieSettings();
 
@@ -67,7 +46,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                            .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
-builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddWebServices(builder.Configuration);
 
@@ -102,16 +81,14 @@ builder.Services.Configure<ServiceConfig>(config =>
     config.Path = "/allservices";
 });
 
-
-// 추가 Bind configuration "eShopWeb:Settings" section to the Settings object
+// Bind configuration "eShopWeb:Settings" section to the Settings object
 builder.Services.Configure<SettingsViewModel>(builder.Configuration.GetSection("eShopWeb:Settings"));
-// 추가 Initialize useAppConfig parameter
+// Initialize useAppConfig parameter
 var useAppConfig = false;
-// 추가
 Boolean.TryParse(builder.Configuration["UseAppConfig"], out useAppConfig);
-// 추가 Add Azure App Configuration middleware to the container of services.
+// Add Azure App Configuration middleware to the container of services.
 
-// 추가 Load configuration from Azure App Configuration
+// Load configuration from Azure App Configuration
 if (useAppConfig)
 {
     builder.Services.AddAzureAppConfiguration();
@@ -119,20 +96,19 @@ if (useAppConfig)
 
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
-         options.Connect(builder.Configuration["AppConfigConnection"])
-        .ConfigureRefresh(refresh =>
-        {
-            // Default cache expiration is 30 seconds
-            refresh.Register("eShopWeb:Settings:NoResultsMessage").SetCacheExpiration(TimeSpan.FromSeconds(10));
-        })
-        .UseFeatureFlags(featureFlagOptions =>
-        {
-            // Default cache expiration is 30 seconds
-            featureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(10);
-        });
+        options.Connect(builder.Configuration["AppConfigConnection"])
+       .ConfigureRefresh(refresh =>
+       {
+           // Default cache expiration is 30 seconds
+           refresh.Register("eShopWeb:Settings:NoResultsMessage").SetCacheExpiration(TimeSpan.FromSeconds(5));
+       })
+       .UseFeatureFlags(featureFlagOptions =>
+       {
+           // Default cache expiration is 30 seconds
+           featureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(5);
+       });
     });
 }
-
 
 // blazor configuration
 var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguration.CONFIG_NAME);
@@ -142,7 +118,7 @@ var baseUrlConfig = configSection.Get<BaseUrlConfiguration>();
 // Blazor Admin Required Services for Prerendering
 builder.Services.AddScoped<HttpClient>(s => new HttpClient
 {
-    BaseAddress = new Uri(baseUrlConfig!.WebBase)
+    BaseAddress = new Uri(baseUrlConfig.WebBase)
 });
 
 // add blazor services
@@ -153,8 +129,15 @@ builder.Services.AddScoped<HttpService>();
 builder.Services.AddBlazorServices();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddFeatureManagement();
 
 var app = builder.Build();
+
+if (useAppConfig)
+{
+    // Use Azure App Configuration middleware for dynamic configuration refresh.
+    app.UseAzureAppConfiguration();
+}
 
 app.Logger.LogInformation("App created...");
 
@@ -176,6 +159,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         app.Logger.LogError(ex, "An error occurred seeding the DB.");
+        //telemetryClient.TrackException(ex);
     }
 }
 
@@ -230,7 +214,6 @@ app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllerRoute("default", "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
 app.MapRazorPages();
