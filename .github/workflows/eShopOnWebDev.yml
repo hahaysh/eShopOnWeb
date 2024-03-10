@@ -1,7 +1,10 @@
-name: eShopOnWebDEMO
+name: eShopOnWebDev
 
-#Triggers (uncomment line below to use it)
-# on: [push, workflow_dispatch]
+#Triggers
+on:
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
 
 #Environment variables https://docs.github.com/en/actions/learn-github-actions/environment-variables
 env:
