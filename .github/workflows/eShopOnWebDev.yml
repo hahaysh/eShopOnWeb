@@ -3,7 +3,7 @@ name: eShopOnWebDev
 #Triggers
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev" ]
   workflow_dispatch:
 
 #Environment variables https://docs.github.com/en/actions/learn-github-actions/environment-variables
