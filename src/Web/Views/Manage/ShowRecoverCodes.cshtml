@@ -16,13 +16,10 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        @if (Model.RecoveryCodes != null)
+        @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
         {
-            @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
-            {
-                <code>@Model.RecoveryCodes[row]</code><text>&nbsp;</text><code>@Model.RecoveryCodes[row + 1]</code><br />
-            }
+            <code>@Model.RecoveryCodes[row]</code><text>&nbsp;</text><code>@Model.RecoveryCodes[row + 1]</code><br />
         }
     </div>
 </div>
-© 2023 GitHub, Inc.
+© 2021 GitHub, Inc.

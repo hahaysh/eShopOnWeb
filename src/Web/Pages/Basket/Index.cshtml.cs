@@ -1,5 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
@@ -67,13 +66,11 @@ public class IndexModel : PageModel
 
     private string GetOrSetBasketCookieAndUserName()
     {
-        Guard.Against.Null(Request.HttpContext.User.Identity, nameof(Request.HttpContext.User.Identity));
-        string? userName = null;
+        string userName = null;
 
         if (Request.HttpContext.User.Identity.IsAuthenticated)
         {
-            Guard.Against.Null(Request.HttpContext.User.Identity.Name, nameof(Request.HttpContext.User.Identity.Name));
-            return Request.HttpContext.User.Identity.Name!;
+            return Request.HttpContext.User.Identity.Name;
         }
 
         if (Request.Cookies.ContainsKey(Constants.BASKET_COOKIENAME))

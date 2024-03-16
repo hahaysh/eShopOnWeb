@@ -22,9 +22,12 @@
       "launchBrowser": true,
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_TENANT_ID": "{azure-tenant-id}",
+        "AZURE_CLIENT_ID": "{azure-client-id}",
+        "AZURE_CLIENT_SECRET": "{azure-client-secret}"
       },
-      "applicationUrl": "https://localhost:6001;http://localhost:6000"
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
     "Web - PROD": {
       "commandName": "Project",
@@ -33,7 +36,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
-      "applicationUrl": "https://localhost:6001;http://localhost:6000"
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }
