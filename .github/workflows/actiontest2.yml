@@ -3,7 +3,8 @@
 
 name: Test Dotnet Build
 
-#on:
+on:
+  workflow_dispatch:
 #  push:
 #    branches: [ "main" ]
 
