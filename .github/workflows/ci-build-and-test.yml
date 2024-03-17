@@ -1,9 +1,9 @@
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - dev
-  #     - main
+  push:
+    branches:
+      - dev
+      - main
   pull_request:
     types:
       - opened
