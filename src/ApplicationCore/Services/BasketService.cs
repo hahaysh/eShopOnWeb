@@ -23,6 +23,7 @@ public class BasketService : IBasketService
     {
         var basketSpec = new BasketWithItemsSpecification(username);
 
+        string strTemp = string.Empty;
         //var basket = await _basketRepository.FirstOrDefaultAsync(basketSpec);
         Basket basket = await _basketRepository.GetBySpecAsync(basketSpec);
 
