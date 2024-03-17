@@ -1,4 +1,4 @@
-﻿using System.Net.Mime;
+using System.Net.Mime;
 using Ardalis.ListStartupServices;
 using BlazorAdmin;
 using BlazorAdmin.Services;
@@ -124,6 +124,7 @@ builder.Services.AddScoped<HttpService>();
 builder.Services.AddBlazorServices();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddFeatureManagement();
 
 var app = builder.Build();
 
@@ -153,6 +154,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         app.Logger.LogError(ex, "An error occurred seeding the DB.");
+        //telemetryClient.TrackException(ex);
     }
 }
 
@@ -207,7 +209,6 @@ app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllerRoute("default", "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
 app.MapRazorPages();
