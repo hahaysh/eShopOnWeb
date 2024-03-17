@@ -4,9 +4,9 @@ on:
     branches:
       - dev
       - main
-  pull_request:
-    types:
-      - opened
+#  pull_request:
+#    types:
+#      - opened
         
 name: CI DEV & Test
 
