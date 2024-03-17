@@ -1,9 +1,9 @@
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - dev
-      - main
+  # push:
+  #   branches:
+  #     - dev
+  #     - main
   pull_request:
     types:
       - opened
@@ -27,8 +27,8 @@ jobs:
            
          #checkout the repository
         - uses: actions/checkout@v2
-         # with: 
-         #  path: github.event.pull_request.base.ref
+          with: 
+            path: github.event.pull_request.base.ref
            
         #prepare runner for desired .net version SDK
         - name: Setup .NET
