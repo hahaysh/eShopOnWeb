@@ -1,44 +1,32 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-	"name": "eShopOnWeb",
-	"image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
- 
-	"customizations": {
-		 // Configure properties specific to VS Code.
-		"vscode": {
-			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": [
-				"ms-dotnettools.csharp",
-				"ms-dotnettools.csdevkit",
-				"formulahendry.dotnet-test-explorer",
-        			"ms-vscode.vscode-node-azure-pack",
-        			"ms-kubernetes-tools.vscode-kubernetes-tools",
-        			"redhat.vscode-yaml"
-			]
+	"name": "C# (.NET)",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/dotnet:0-7.0",
+	"features": {
+		"ghcr.io/devcontainers/features/dotnet:2": {
+			"version": "latest"
 		}
 	},
 
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [5000, 5001],
+	"portsAttributes": {
+			"5001": {
+				"protocol": "https"
+			}
+	}
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet dev-certs https --trust"
+	// "postCreateCommand": "dotnet restore",
 
-	// [Optional] To reuse of your local HTTPS dev cert, first export it locally using this command:
-	//  * Windows PowerShell:
-	//     dotnet dev-certs https --trust; dotnet dev-certs https -ep "$env:USERPROFILE/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
-	//  * macOS/Linux terminal:
-	//     dotnet dev-certs https --trust; dotnet dev-certs https -ep "${HOME}/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
-	//
-	// Next, after running the command above, uncomment lines in the 'mounts' and 'remoteEnv' lines below,
-	// and open / rebuild the container so the settings take effect.
-	//
-	// "mounts": [
-	// 	// "source=${env:HOME}${env:USERPROFILE}/.aspnet/https,target=/home/vscode/.aspnet/https,type=bind"
-	// ],
-	// "remoteEnv": {
-	// 	// "ASPNETCORE_Kestrel__Certificates__Default__Password": "SecurePwdGoesHere",
-	// 	// "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/aspnetapp.pfx",
-	// },
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
 }

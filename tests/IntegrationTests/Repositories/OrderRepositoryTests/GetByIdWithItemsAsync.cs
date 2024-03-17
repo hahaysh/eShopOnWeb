@@ -49,7 +49,7 @@ public class GetByIdWithItemsAsync
 
         //Act
         var spec = new OrderWithItemsByIdSpec(secondOrderId);
-        var orderFromRepo = await _orderRepository.FirstOrDefaultAsync(spec);
+        var orderFromRepo = await _orderRepository.GetBySpecAsync(spec);
 
         //Assert
         Assert.Equal(secondOrderId, orderFromRepo.Id);

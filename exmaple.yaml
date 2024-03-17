@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshoponwebdemo2
+spec:
+  selector:
+    app: eshoponwebdemo2
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshoponwebdemo2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eshoponwebdemo2
+  template:
+    metadata:
+      labels:
+        app: eshoponwebdemo2
+    spec:
+      containers:
+      - name: eshoponwebdemo2
+        image: eshopacrdemo2.azurecr.io/eshopwebmvc:latest
+        ports:
+        - name: public-port
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: public-port
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+

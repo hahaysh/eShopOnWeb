@@ -1,0 +1,50 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+#  push:
+#   branches:
+#     - dev
+#     - main
+
+#env:
+#  env_var: ${{ vars.ENV_CONTEXT_VAR }}
+
+  
+jobs:
+
+  build:
+    environment: Development   
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker compose build 
+
+    - name: Deploy to ACR
+      uses: azure/docker-login@v1
+      with:
+            login-server:  ${{ vars.ACR_SERVER }}
+            username: ${{ vars.ACR_USERNAME }}
+            password: ${{ secrets.ACR_PASS }}
+    - run: |
+            docker push ${{ vars.ACR_SERVER }}/eshopwebmvc
+            docker push ${{ vars.ACR_SERVER }}/eshoppublicapi   
+
+    - name: Log into Azure
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Deploy to Azure Container Instances'
+      uses: 'azure/aci-deploy@v1'
+      with:
+            resource-group: ${{ vars.AZURE_RG }}
+            dns-name-label: ${{ vars.AZURE_RG }}${{ github.run_number }}
+            image: ${{ vars.ACR_SERVER }}/eshopwebmvc
+            registry-login-server: ${{ vars.ACR_SERVER }}
+            registry-username: ${{ vars.ACR_USERNAME }}
+            registry-password: ${{ secrets.ACR_PASS }}
+            name: ${{ vars.ACI_NAME }}
+            location: 'east us'

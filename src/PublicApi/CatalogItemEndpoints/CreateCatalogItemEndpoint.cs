@@ -15,8 +15,9 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// <summary>
 /// Creates a new Catalog Item
 /// </summary>
-public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemRequest, IRepository<CatalogItem>>
+public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemRequest>
 {
+    private IRepository<CatalogItem> _itemRepository;
     private readonly IUriComposer _uriComposer;
 
     public CreateCatalogItemEndpoint(IUriComposer uriComposer)
@@ -30,25 +31,26 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             [Authorize(Roles = BlazorShared.Authorization.Constants.Roles.ADMINISTRATORS, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async
             (CreateCatalogItemRequest request, IRepository<CatalogItem> itemRepository) =>
             {
-                return await HandleAsync(request, itemRepository);
+                _itemRepository = itemRepository;
+                return await HandleAsync(request);
             })
             .Produces<CreateCatalogItemResponse>()
             .WithTags("CatalogItemEndpoints");
     }
 
-    public async Task<IResult> HandleAsync(CreateCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
+    public async Task<IResult> HandleAsync(CreateCatalogItemRequest request)
     {
         var response = new CreateCatalogItemResponse(request.CorrelationId());
 
         var catalogItemNameSpecification = new CatalogItemNameSpecification(request.Name);
-        var existingCataloogItem = await itemRepository.CountAsync(catalogItemNameSpecification);
+        var existingCataloogItem = await _itemRepository.CountAsync(catalogItemNameSpecification);
         if (existingCataloogItem > 0)
         {
             throw new DuplicateException($"A catalogItem with name {request.Name} already exists");
         }
 
         var newItem = new CatalogItem(request.CatalogTypeId, request.CatalogBrandId, request.Description, request.Name, request.Price, request.PictureUri);
-        newItem = await itemRepository.AddAsync(newItem);
+        newItem = await _itemRepository.AddAsync(newItem);
 
         if (newItem.Id != 0)
         {
@@ -57,7 +59,7 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             //  In production, we recommend uploading to a blob storage and deliver the image via CDN after a verification process.
 
             newItem.UpdatePictureUri("eCatalog-item-default.png");
-            await itemRepository.UpdateAsync(newItem);
+            await _itemRepository.UpdateAsync(newItem);
         }
 
         var dto = new CatalogItemDto
@@ -71,6 +73,6 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             Price = newItem.Price
         };
         response.CatalogItem = dto;
-        return Results.Created($"api/catalog-items/{dto.Id}", response);
+        return Results.Created($"api/catalog-items/{dto.Id}", response);       
     }
 }

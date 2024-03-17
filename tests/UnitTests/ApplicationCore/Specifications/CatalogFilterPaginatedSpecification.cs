@@ -1,4 +1,6 @@
-﻿using Microsoft.eShopWeb.ApplicationCore.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Xunit;
 
 namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Specifications;
@@ -10,7 +12,9 @@ public class CatalogFilterPaginatedSpecification
     {
         var spec = new eShopWeb.ApplicationCore.Specifications.CatalogFilterPaginatedSpecification(0, 10, null, null);
 
-        var result = spec.Evaluate(GetTestCollection());
+        var result = GetTestCollection()
+            .AsQueryable()
+            .Where(spec.WhereExpressions.FirstOrDefault().Filter);
 
         Assert.NotNull(result);
         Assert.Equal(4, result.ToList().Count);
@@ -21,7 +25,9 @@ public class CatalogFilterPaginatedSpecification
     {
         var spec = new eShopWeb.ApplicationCore.Specifications.CatalogFilterPaginatedSpecification(0, 10, 1, 1);
 
-        var result = spec.Evaluate(GetTestCollection()).ToList();
+        var result = GetTestCollection()
+            .AsQueryable()
+            .Where(spec.WhereExpressions.FirstOrDefault().Filter);
 
         Assert.NotNull(result);
         Assert.Equal(2, result.ToList().Count);

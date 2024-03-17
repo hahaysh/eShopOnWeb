@@ -13,8 +13,9 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// <summary>
 /// Updates a Catalog Item
 /// </summary>
-public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemRequest, IRepository<CatalogItem>>
-{ 
+public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemRequest>
+{
+    private IRepository<CatalogItem> _itemRepository;
     private readonly IUriComposer _uriComposer;
 
     public UpdateCatalogItemEndpoint(IUriComposer uriComposer)
@@ -28,28 +29,24 @@ public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemReq
             [Authorize(Roles = BlazorShared.Authorization.Constants.Roles.ADMINISTRATORS, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] async
             (UpdateCatalogItemRequest request, IRepository<CatalogItem> itemRepository) =>
             {
-                return await HandleAsync(request, itemRepository);
+                _itemRepository = itemRepository;
+                return await HandleAsync(request);
             })
             .Produces<UpdateCatalogItemResponse>()
             .WithTags("CatalogItemEndpoints");
     }
 
-    public async Task<IResult> HandleAsync(UpdateCatalogItemRequest request, IRepository<CatalogItem> itemRepository)
+    public async Task<IResult> HandleAsync(UpdateCatalogItemRequest request)
     {
         var response = new UpdateCatalogItemResponse(request.CorrelationId());
 
-        var existingItem = await itemRepository.GetByIdAsync(request.Id);
-        if (existingItem == null)
-        {
-            return Results.NotFound();
-        }
+        var existingItem = await _itemRepository.GetByIdAsync(request.Id);
 
-        CatalogItem.CatalogItemDetails details = new(request.Name, request.Description, request.Price);
-        existingItem.UpdateDetails(details);
+        existingItem.UpdateDetails(request.Name, request.Description, request.Price);
         existingItem.UpdateBrand(request.CatalogBrandId);
         existingItem.UpdateType(request.CatalogTypeId);
 
-        await itemRepository.UpdateAsync(existingItem);
+        await _itemRepository.UpdateAsync(existingItem);
 
         var dto = new CatalogItemDto
         {

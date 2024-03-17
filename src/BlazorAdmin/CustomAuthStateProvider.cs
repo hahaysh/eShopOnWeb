@@ -63,7 +63,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
         if (user == null || !user.IsAuthenticated)
         {
-            return new ClaimsPrincipal(new ClaimsIdentity());
+            return null;
         }
 
         var identity = new ClaimsIdentity(

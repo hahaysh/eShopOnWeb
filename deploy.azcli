@@ -1,0 +1,25 @@
+az login
+az account list -o table
+az account set --subscription 77ccd0c7-9a35-4270-8890-ab585412e22b
+az aks get-credentials --resource-group rg-eshoponweb-waglcom --name eshoponwebdemo2 --overwrite-existing
+
+kubectl cluster-info
+kubectl config use-context eshoponwebdemo2
+
+http://172.171.75.60
+
+kubectl create namespace eshoponwebdemo2
+kubectl get deployments -n eshoponwebdemo2
+kubectl get nodes -n eshoponwebdemo2
+kubectl get pods -n eshoponwebdemo2
+kubectl get services -n eshoponwebdemo2
+
+kubectl apply -n eshoponwebdemo2 -f exmaple.yaml
+
+kubectl delete -f exmaple.yaml -n eshoponwebdemo2
+
+# sample commands
+kubectl create deployment nginx --image=nginx
+kubectl get pods -l app=nginx
+
+

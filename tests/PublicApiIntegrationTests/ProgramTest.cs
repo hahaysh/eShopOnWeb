@@ -2,25 +2,26 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Http;
 
-namespace PublicApiIntegrationTests;
-
-[TestClass]
-public class ProgramTest
+namespace PublicApiIntegrationTests
 {
-    private static WebApplicationFactory<Program> _application = new();
-
-    public static HttpClient NewClient
+    [TestClass]
+    public class ProgramTest
     {
-        get
+        private static WebApplicationFactory<Program> _application;
+
+        public static HttpClient NewClient
         {
-            return _application.CreateClient();
+            get
+            {
+                return _application.CreateClient();
+            }
         }
-    }
 
-    [AssemblyInitialize]
-    public static void AssemblyInitialize(TestContext _)
-    {
-        _application = new WebApplicationFactory<Program>();
+        [AssemblyInitialize]
+        public static void AssemblyInitialize(TestContext _)
+        {
+            _application = new WebApplicationFactory<Program>();
 
+        }
     }
 }

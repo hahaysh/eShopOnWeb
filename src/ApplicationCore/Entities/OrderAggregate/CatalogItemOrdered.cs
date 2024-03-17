@@ -19,8 +19,10 @@ public class CatalogItemOrdered // ValueObject
         PictureUri = pictureUri;
     }
 
-    #pragma warning disable CS8618 // Required by Entity Framework
-    private CatalogItemOrdered() {}
+    private CatalogItemOrdered()
+    {
+        // required by EF
+    }
 
     public int CatalogItemId { get; private set; }
     public string ProductName { get; private set; }

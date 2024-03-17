@@ -1,0 +1,8 @@
+# 리소스 그룹 만들기
+az group create --name rg-eshoponweb --location eastus
+
+# Service Principal(서비스 주체) 만들기
+# rg-eshoponweb 리소스 그룹에 contributor로 역할을 할당하면서 서비스 주체를 만들기
+az ad sp create-for-rbac --name sp-Action-eshoponweb --role contributor --scopes /subscriptions/77ccd0c7-9a35-4270-8890-ab585412e22b/resourceGroups/rg-eshoponweb --sdk-auth
+
+

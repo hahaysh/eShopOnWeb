@@ -6,8 +6,10 @@ public class OrderItem : BaseEntity
     public decimal UnitPrice { get; private set; }
     public int Units { get; private set; }
 
-    #pragma warning disable CS8618 // Required by Entity Framework
-    private OrderItem() {}
+    private OrderItem()
+    {
+        // required by EF
+    }
 
     public OrderItem(CatalogItemOrdered itemOrdered, decimal unitPrice, int units)
     {

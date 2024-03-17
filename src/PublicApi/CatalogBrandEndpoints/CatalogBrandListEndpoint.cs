@@ -13,8 +13,9 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints;
 /// <summary>
 /// List Catalog Brands
 /// </summary>
-public class CatalogBrandListEndpoint : IEndpoint<IResult, IRepository<CatalogBrand>>
+public class CatalogBrandListEndpoint : IEndpoint<IResult>
 {
+    private IRepository<CatalogBrand> _catalogBrandRepository;
     private readonly IMapper _mapper;
 
     public CatalogBrandListEndpoint(IMapper mapper)
@@ -27,17 +28,18 @@ public class CatalogBrandListEndpoint : IEndpoint<IResult, IRepository<CatalogBr
         app.MapGet("api/catalog-brands",
             async (IRepository<CatalogBrand> catalogBrandRepository) =>
             {
-                return await HandleAsync(catalogBrandRepository);
+                _catalogBrandRepository = catalogBrandRepository;
+                return await HandleAsync();
             })
            .Produces<ListCatalogBrandsResponse>()
            .WithTags("CatalogBrandEndpoints");
     }
 
-    public async Task<IResult> HandleAsync(IRepository<CatalogBrand> catalogBrandRepository)
+    public async Task<IResult> HandleAsync()
     {
         var response = new ListCatalogBrandsResponse();
 
-        var items = await catalogBrandRepository.ListAsync();
+        var items = await _catalogBrandRepository.ListAsync();
 
         response.CatalogBrands.AddRange(items.Select(_mapper.Map<CatalogBrandDto>));
 

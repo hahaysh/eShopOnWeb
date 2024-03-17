@@ -37,6 +37,27 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "bridge-to-kubernetes.resource",
+            "type": "bridge-to-kubernetes.resource",
+            "resource": "eshoponwebdemo2",
+            "resourceType": "service",
+            "ports": [
+                80
+            ],
+            "targetCluster": "eshoponwebdemo2",
+            "targetNamespace": "eshoponwebdemo2",
+            "useKubernetesServiceEnvironmentVariables": false,
+            "targetContainer": "eshoponwebdemo2"
+        },
+        {
+            "label": "bridge-to-kubernetes.compound",
+            "dependsOn": [
+                "bridge-to-kubernetes.resource",
+                "build"
+            ],
+            "dependsOrder": "sequence"
         }
     ]
 }

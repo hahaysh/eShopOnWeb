@@ -1,5 +1,5 @@
 ﻿using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
-using NSubstitute;
+using Moq;
 
 namespace Microsoft.eShopWeb.UnitTests.Builders;
 
@@ -22,17 +22,17 @@ public class BasketBuilder
 
     public Basket WithNoItems()
     {
-        var basketMock = Substitute.For<Basket>(BasketBuyerId);
-        basketMock.Id.Returns(BasketId);
+        var basketMock = new Mock<Basket>(BasketBuyerId);
+        basketMock.SetupGet(s => s.Id).Returns(BasketId);
 
-        _basket = basketMock;
+        _basket = basketMock.Object;
         return _basket;
     }
 
     public Basket WithOneBasketItem()
     {
-        var basketMock = Substitute.For<Basket>(BasketBuyerId);
-        _basket = basketMock;
+        var basketMock = new Mock<Basket>(BasketBuyerId);
+        _basket = basketMock.Object;
         _basket.AddItem(2, 3.40m, 4);
         return _basket;
     }
