@@ -21,7 +21,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
     - uses: Azure/get-keyvault-secrets@v1
       with: 
-        keyvault: 'eshoponwebdemo-kv'
+        keyvault: ${{ vars.KV_NAME }}
         secrets: 'ACR-PASS'
       id: arc-pass
           
