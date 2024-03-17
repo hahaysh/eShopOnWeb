@@ -3,9 +3,9 @@
 
 name: Test Dotnet Build
 
-#on:
-#  push:
-#    branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 7.0.x
 
     - name: Restore dependencies
       run: dotnet restore ./eShopOnWeb.sln
