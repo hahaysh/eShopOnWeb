@@ -23,7 +23,6 @@ public class BasketItem : BaseEntity
 
         Quantity += quantity;
 
-        throw new System.Exception("This is Demo");
     }
 
     public void SetQuantity(int quantity)
