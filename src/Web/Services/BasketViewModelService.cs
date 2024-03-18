@@ -72,7 +72,7 @@ public class BasketViewModelService : IBasketViewModelService
             return basketItemViewModel;
         }).ToList();
 
-        throw new Exception("This is a demo exception. Please ignore.");
+        throw new Exception("This is a demo exception. Please ignore. 77777");
 
         return items;
     }
