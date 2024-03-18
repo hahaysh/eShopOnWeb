@@ -72,6 +72,8 @@ public class BasketViewModelService : IBasketViewModelService
             return basketItemViewModel;
         }).ToList();
 
+        throw new Exception("TEST");
+        
         return items;
     }
 
